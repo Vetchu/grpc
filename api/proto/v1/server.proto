@@ -1,0 +1,41 @@
+syntax = "proto3";
+package v1;
+option go_package = ".;v1";
+
+message Subscribe{
+  string user = 1;
+  repeated string lab = 2;
+}
+
+message Task{
+  enum Type {
+    TEST = 0;
+    HOMEWORK = 1;
+    QUIZ = 2;
+  }
+  Type type = 1;
+  int64 deadline = 2;
+  repeated string descriptions = 3;
+}
+
+message Solution{
+  string id = 1;
+  string comment = 2;
+  repeated bytes solution = 3;
+}
+
+message GradeSolution{
+  int64 time_graded = 1;
+  int32 grade = 2;
+  string feedback = 3;
+}
+
+message Empty {
+
+}
+
+service StudentService {
+  rpc SignForLab(Subscribe) returns (stream Task) {}
+  rpc SendSolution(Solution) returns (stream GradeSolution) {}
+  rpc TESTCreateAssignment(Task) returns (Empty) {}
+}

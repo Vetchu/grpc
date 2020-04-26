@@ -1,0 +1,6 @@
+server
+go.sum
+.idea/**
+.idea/*
+.idea
+.idea/workspace.xml
