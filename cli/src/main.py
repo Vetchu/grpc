@@ -7,9 +7,10 @@ import random
 
 import grpc
 import sys
-from src import server_pb2 as server__pb2
+
+from src.api.v1 import server_pb2 as server__pb2
 #
-from src.server_pb2_grpc import StudentServiceStub
+from src.api.v1.server_pb2_grpc import StudentServiceStub
 
 connection_array = []
 channel = grpc.insecure_channel('localhost:5000')
