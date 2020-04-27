@@ -1,2 +1,0 @@
-protoc --proto_path=api/proto/v1 --proto_path=third_party --go_out=plugins=grpc:srv/pkg/api/v1 --python_out=cli/api/v1 server.proto 
-python -m grpc_tools.protoc -I./api/proto/v1 --python_out=cli/src --grpc_python_out=cli/src/api server.proto

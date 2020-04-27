@@ -12,8 +12,9 @@ import (
 
 func check(e error) {
 	if e != nil {
-		fmt.Print("sth funky")
+		fmt.Print("Error Happened{\n")
 		fmt.Print(e)
+		fmt.Print("\n}")
 		//panic(e)
 	}
 }
@@ -29,7 +30,6 @@ func errorStream(e error, subscribe *v1.Subscribe, s *studentGradeServer, t *v1.
 
 // studentGradeServer is implementation of v1.StudentService proto interface
 type studentGradeServer struct {
-	//sems         map[string]semaphore
 	labs         map[string][]string
 	students     map[string]chan v1.Task
 	tasksToGrade map[string]chan v1.GradeSolution
@@ -42,6 +42,10 @@ func (s *studentGradeServer) TESTCreateAssignment(ctx context.Context, task *v1.
 		allLabs = append(allLabs, k)
 	}
 	rand.Seed(time.Now().Unix())
+	if len(allLabs) == 0{
+		log.Printf("Tried to assign a new task with no labs available")
+		return &v1.Empty{}, nil
+	}
 	labIndex := rand.Intn(len(allLabs))
 
 	pickedLab := s.labs[allLabs[labIndex]]
@@ -77,7 +81,7 @@ func (s *studentGradeServer) SignForLab(subscribe *v1.Subscribe, stream v1.Stude
 		if s.labs[lab] == nil {
 			s.labs[lab] = []string{}
 		}
-		if !contains(s.labs[lab],subscribe.User){
+		if !contains(s.labs[lab], subscribe.User) {
 			s.labs[lab] = append(s.labs[lab], subscribe.User)
 		}
 	}
@@ -117,7 +121,6 @@ func (s *studentGradeServer) SendSolution(solution *v1.Solution, server v1.Stude
 	return nil
 }
 
-// NewStudentServiceServer creates Chat service object
 func NewStudentServiceServer() v1.StudentServiceServer {
 	return &studentGradeServer{
 		labs:         make(map[string][]string),
@@ -125,44 +128,3 @@ func NewStudentServiceServer() v1.StudentServiceServer {
 		tasksToGrade: make(map[string]chan v1.GradeSolution),
 	}
 }
-
-//// Send sends message to the server
-//func (s *studentGradeServer) SendMsg(ctx context.Context, message *v1.Task) (*empty.Empty, error) {
-//	log.Print("New msg appeared!")
-//	if message != nil {
-//		log.Printf("Send requested: message=%v", *message)
-//		if message.Pto == "*" {
-//			for _, element := range reflect.ValueOf(s.students).MapKeys() {
-//				if element.String() == message.Pfrom {
-//					continue
-//				}
-//				log.Printf("Sending to %s", element.String())
-//				s.students[element.String()] <- *message
-//			}
-//		} else {
-//			s.students[message.Pto] <- *message
-//		}
-//	} else {
-//		log.Print("Send requested: message=<empty>")
-//	}
-//
-//	return &empty.Empty{}, nil
-//}
-//
-//// Subscribe is streaming method to get echo messages from the server
-//func (s *studentGradeServer) RcvMsg(msg *v1.Task, stream v1.ChatService_RcvMsgServer) error {
-//	log.Print("Subscribe requested")
-//	Whom := msg.Pfrom
-//	s.students[Whom] = make(chan v1.Task, 1000)
-//	for {
-//		log.Printf("I entered the loop as %s", Whom)
-//		m := <-s.students[Whom]
-//		n := v1.Task{Pfrom: m.Pfrom, Text: m.Text}
-//		if err := stream.SendMsg(&n); err != nil {
-//			s.students[m.Pto] <- m
-//			log.Printf("Stream connection failed: %v", err)
-//			return nil
-//		}
-//		log.Printf("Message sent: %+v", n)
-//	}
-//}
