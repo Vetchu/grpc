@@ -26,9 +26,9 @@ def randomString(stringLength=8):
     return ''.join(random.sample(letters, stringLength))
 
 
-args.append(randomString())
-args.append("tekst")
-args.append("tekst2")
+# args.append(randomString())
+# args.append("tekst")
+# args.append("tekst2")
 sub = server__pb2.Subscribe(user=args[1], lab=[args[2], args[3]])
 
 print(sub)
@@ -70,4 +70,5 @@ threading.Thread(target=subscribe, args=(connection_array,)).start()
 
 create_task = server__pb2.Task(type=0, deadline=int(time.time()) + 100, descriptions=["jedna", "druga", "trzecia"])
 
-# connection_array[1].TESTCreateAssignment(create_task)
+
+#   connection_array[1].TESTCreateAssignment(create_task,wait_for_ready=True)
